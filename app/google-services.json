@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "291879255080",
+    "project_id": "campus-borrowhub-93986",
+    "storage_bucket": "campus-borrowhub-93986.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291879255080:android:b38d14ca3fdaa44635091d",
+        "android_client_info": {
+          "package_name": "com.example.campusborrowhub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJKTh69XJ2xh5q0bw2sEq5ixbkp7ydkoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

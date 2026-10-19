@@ -1,0 +1,124 @@
+CAMPUS BORROWHUB  -  REAL VERSION (Firebase)  -  SETUP GUIDE
+=============================================================
+Do the steps in order. Everything is free for a campus-sized pilot.
+
+*** QUICK INSTALL (google-services.json is ALREADY included in this zip) ***
+  1. Close this zip's folder if you opened it as a project. It is NOT a full project.
+  2. In Android Studio open your REAL project:  File > Open >
+        C:\Users\kat\AndroidStudioProjects\CampusBorrowHub
+  3. Unzip this file. Copy the "app" folder from it and paste it into your
+     CampusBorrowHub project folder (in Windows Explorer). Click "Replace the files in
+     the destination" / merge when asked. This puts MainActivity.kt and
+     google-services.json in the right places and does not touch your Gradle files.
+  4. Then do PART 1 steps 3-5 (Firebase console) and PART 2 A, B, C (Gradle + manifest).
+     (Part 1 steps 1-2 and Part 2 step D are already done by the copy above.)
+Allowed emails: @plmun.edu.ph only.
+
+
+PART 1 - FIREBASE CONSOLE  (console.firebase.google.com)
+--------------------------------------------------------
+1. You already created the project and registered the Android app
+   (package name: com.example.campusborrowhub).
+   On the "Download and then add config file" step click
+   "Download google-services.json".
+
+2. Put google-services.json in your project:
+   - In Android Studio, change the left panel from "Android" to "Project" view
+     (dropdown at the top of the left panel).
+   - Drag/copy google-services.json into the folder:   CampusBorrowHub > app
+     (the same folder that contains build.gradle.kts and src).
+   - Back in Firebase click Next / Next / Continue to console
+     (we'll do the Gradle part ourselves in Part 2).
+
+3. Turn on sign-in:
+   Firebase console > Build > Authentication > Get started >
+   Sign-in method > "Email/Password" > Enable the FIRST switch
+   ("Email/Password"). Leave "Email link (passwordless sign-in)" OFF. Save.
+
+4. Create the database:
+   Build > Firestore Database > Create database
+   - Location: asia-southeast1 (Singapore)  (closest to Manila; cannot be changed later)
+   - Choose "Start in production mode"  > Create.
+
+5. Add the security rules (this is what makes it safe):
+   Firestore Database > "Rules" tab > delete everything in the box >
+   open the file firestore.rules from this zip, copy ALL of it, paste it in >
+   click "Publish".
+
+
+PART 2 - ANDROID STUDIO
+-----------------------
+A) Project-level Gradle file:   build.gradle.kts   (the one in the project root, NOT inside app)
+   Inside the  plugins { ... }  block add this line:
+
+       id("com.google.gms.google-services") version "4.5.0" apply false
+
+   Example:
+       plugins {
+           alias(libs.plugins.android.application) apply false
+           alias(libs.plugins.kotlin.compose) apply false
+           id("com.google.gms.google-services") version "4.5.0" apply false
+       }
+
+B) App-level Gradle file:   app/build.gradle.kts
+   1. Inside the  plugins { ... }  block add this line:
+
+       id("com.google.gms.google-services")
+
+   2. Inside the  dependencies { ... }  block add these 3 lines:
+
+       implementation(platform("com.google.firebase:firebase-bom:35.0.0"))
+       implementation("com.google.firebase:firebase-auth")
+       implementation("com.google.firebase:firebase-firestore")
+
+   (Check "minSdk" in that file is 23 or higher. The default is 24, so you're fine.)
+
+C) Manifest:  app/src/main/AndroidManifest.xml
+   Add this line just ABOVE the <application ...> tag:
+
+       <uses-permission android:name="android.permission.INTERNET" />
+
+D) Code:  open MainActivity.kt, select all (Ctrl+A), delete, and paste the entire
+   MainActivity.kt from this zip.
+
+E) Click "Sync Now" (the banner at the top), wait for it to finish, then press Run.
+   The first sync downloads the Firebase libraries, so it needs internet.
+
+
+PART 3 - TRY IT
+---------------
+1. Create account with your @plmun.edu.ph email, student ID and a password (8+ characters).
+2. Open the verification email we send (check SPAM / JUNK too), tap the link,
+   go back to the app and press "I've verified my email".
+3. To test borrowing you need a SECOND account (a classmate's @plmun.edu.ph email, or a
+   second school email of yours). Use a second phone/emulator, or sign out and in.
+   Flow:  Account A lists an item  ->  Account B requests it  ->  A approves, marks handed over,
+   marks returned (with condition)  ->  both rate each other.
+
+Where is my data?  Firebase console > Firestore Database > Data
+(collections: users, items, requests, messages, reviews, notices, reports).
+Registered students:  Authentication > Users.
+Reported listings:  the "reports" collection.
+
+
+TROUBLESHOOTING
+---------------
+- "Permission denied" banner:  rules not published (Part 1 step 5) or email not verified yet.
+- Build error "google-services.json is missing":  file is not inside the app folder (Part 1 step 2).
+- Verification email never arrives:  check spam, press "Resend email", wait a minute.
+  (Firebase limits how many emails it sends per hour per account.)
+- "Too many attempts":  wait ~15 minutes.
+- Sign-in rejected for non-school email:  by design.
+
+
+WHAT THIS VERSION DOES / DOESN'T DO
+-----------------------------------
+Real: shared database (all students see the same items), school-email verification,
+      requests/approval, chat, ratings, condition history, in-app notifications and
+      due-date / overdue reminders (shown when the app is opened), offline caching,
+      report-a-listing.
+Not yet:  push notifications when the app is closed (needs Firebase Cloud Functions,
+          pay-as-you-go plan), item photos (needs Firebase Storage, same plan),
+          an admin dashboard, in-app payments.
+Before a wider launch:  add a privacy policy (Data Privacy Act of 2012 / RA 10173), and
+                        agree on pickup/return points with your school.
